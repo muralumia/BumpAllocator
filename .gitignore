@@ -1,0 +1,27 @@
+# BumpAllocator build directories
+build/
+cmake-build-*/
+
+# Generated CMake files (for accidental in-source builds)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+Testing/
+
+# Compiled files
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+
+# IDE and operating system files
+.idea/
+.vscode/
+.DS_Store
+
