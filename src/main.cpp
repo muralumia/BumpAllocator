@@ -1,39 +1,42 @@
 #include "BumpAllocator.h"
 
-#include <cstdint>
 #include <iostream>
-#include <new>
 
 struct Point {
     int x;
     int y;
+
+    Point(int xValue, int yValue) : x(xValue), y(yValue) {}
 };
 
 int main() {
     BumpAllocator allocator;
 
-    void* numberMemory = allocator.allocate(sizeof(int), alignof(int));
-    void* pointMemory = allocator.allocate(sizeof(Point), alignof(Point));
+    int* number = allocator.create<int>(42);
+    Point* point = allocator.create<Point>(10, 20);
 
-    if (numberMemory == nullptr || pointMemory == nullptr) {
+    if (number == nullptr || point == nullptr) {
         std::cerr << "The allocator does not have enough memory.\n";
         return 1;
     }
 
-    // Placement new constructs objects inside memory supplied by the allocator.
-    int* number = new (numberMemory) int{42};
-    Point* point = new (pointMemory) Point{10, 20};
-
-    std::cout << "BumpAllocator v0.1\n";
+    std::cout << "BumpAllocator v0.2\n";
     std::cout << "number = " << *number << '\n';
     std::cout << "point = (" << point->x << ", " << point->y << ")\n";
-    std::cout << "used bytes (including alignment padding): "
-              << allocator.used() << " / " << BumpAllocator::capacity << '\n';
+    std::cout << "point belongs to allocator: "
+              << (allocator.owns(point) ? "yes" : "no") << '\n';
+    std::cout << "successful allocations: "
+              << allocator.successfulAllocations() << '\n';
+    std::cout << "used bytes: " << allocator.used() << " / "
+              << BumpAllocator::capacity
+              << '\n';
 
-    // int and Point have trivial destructors, so no explicit destruction is
-    // needed in this example. reset() reuses the entire buffer.
+    allocator.destroy(point);
+    allocator.destroy(number);
     allocator.reset();
+
     std::cout << "used after reset: " << allocator.used() << '\n';
+    std::cout << "peak usage: " << allocator.peakUsed() << " bytes\n";
 
     return 0;
 }
